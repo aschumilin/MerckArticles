@@ -12,6 +12,9 @@ import org.jsoup.nodes.Element;
 
 
 public class HtmlCleaner {
+
+
+	public static void main(String[] args) throws IOException {
 		/*
 		 * first, remove \r\n tokens from original documents: 
 		 	/bin/sed -i 's/\\r\\n//g' ~/WORK/DATA/Merck_IBM-Watson/merck2_short/*
@@ -21,9 +24,6 @@ public class HtmlCleaner {
 		 * - div class="para" (and all nested p elements)
 		 * enclose in <!DOCTYPE html> <html lang="en-US">
 		 */
-
-	public static void main(String[] args) throws IOException {
-		
 //		String testPath = "~/WORK/DATA/Merck_IBM-Watson/Cardiovascular_Examination-Cardiovascular-Disorders_original.html";
 
 		
