@@ -12,31 +12,38 @@ import org.jsoup.nodes.Element;
 
 
 public class HtmlCleaner {
-
-
-	public static void main(String[] args) throws IOException {
 		/*
-		 * first remove \r\n tokens from original documents: sed -i 's/\\r\\n//g' ./*
-		 * extract these elements only:
+		 * first, remove \r\n tokens from original documents: 
+		 	/bin/sed -i 's/\\r\\n//g' ~/WORK/DATA/Merck_IBM-Watson/merck2_short/*
+		 * after that, extract these elements only:
 		 * - title
 		 * - h1, h2, h3
 		 * - div class="para" (and all nested p elements)
-		 * - div class="table-box"
 		 * enclose in <!DOCTYPE html> <html lang="en-US">
 		 */
-//		String testPath = "/home/pilatus/Dropbox/AIFB/12_nach_Master/Merck_IBM-Watson/Cardiovascular_Examination-Cardiovascular-Disorders_original.html";
+
+	public static void main(String[] args) throws IOException {
+		
+//		String testPath = "~/WORK/DATA/Merck_IBM-Watson/Cardiovascular_Examination-Cardiovascular-Disorders_original.html";
 
 		
-		String targetDirPath = "/home/pilatus/WORK/DATA/Merck_IBM-Watson/CLEAN_merck2_short/";
-		String sourceDirPath = "/home/pilatus/WORK/DATA/Merck_IBM-Watson/merck2_short/";
+		String targetDirPath = "~/WORK/DATA/Merck_IBM-Watson/CLEAN_merck2_short/";
+		String sourceDirPath = "~/WORK/DATA/Merck_IBM-Watson/merck2_short/";
 		
 		File[] files = new File(sourceDirPath).listFiles();
 		
+		// iterate over individual files
 		for (int i=0; i < files.length; i++){
-			sop("" + i + " of "+ files.length);
+			sop("cleaning file " + i + " of "+ files.length);
+			
+			// parse original html with jsoup library
 			File htmlInputFile = new File(files[i].getAbsolutePath());
 			Document dirtyDoc = Jsoup.parse(htmlInputFile, "utf-8");
+			
+			// do extraction
 			StringBuffer cleaned = extractCleanHtml(dirtyDoc);
+			
+			// write the result file
 			Files.write(Paths.get(targetDirPath + files[i].getName()), cleaned.toString().getBytes());	
 		}
 
@@ -44,6 +51,7 @@ public class HtmlCleaner {
 
 	private static StringBuffer extractCleanHtml (org.jsoup.nodes.Document dirtyDoc){
 
+		// exclude headlines with the following text:
 		String[] excludeList = new String[]{
 				"Resources In This Article", 
 				"Was This Page Helpful?",
@@ -77,29 +85,20 @@ public class HtmlCleaner {
 
 			}else if (tempTagName.equals("div")   ){
 				String attributeClass = el.attr("class");
-//				sop("DIV");
-				if (attributeClass.equals("para")){
 
+				if (attributeClass.equals("para")){
 
 					cleanedHtml.append(el.select("p").first().toString() + "\n");
 
-					//					for (Element paragraph : el.getAllElements()){
-					//						sop(paragraph.tagName() + "\t" + paragraph.text());
-					//					}
-					//					sop("-------------");
 				}else if (attributeClass.equals("table")){
-					//					sop(el.html().toString());
-					//					sop("-------------");
+					// dont do tables
 				}else{
-
+					// skip
 				}
-
 			}else{
-
+				// skip
 			}
 		}
-
-
 
 		cleanedHtml.append("</html>");
 
